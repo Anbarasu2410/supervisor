@@ -50,7 +50,7 @@ const DriverProfile = () => {
   const [form] = Form.useForm(); // Add form instance
 
   const token = localStorage.getItem("token");
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "https://smt-erp-driver-app-api.vercel.app";
 
   // Fetch profile function that can be called multiple times
   const fetchProfile = async () => {
