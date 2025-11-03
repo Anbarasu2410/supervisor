@@ -47,23 +47,63 @@ const DriverProfile = () => {
   const [messageText, setMessageText] = useState("");
   const [error, setError] = useState("");
 
-  const [form] = Form.useForm(); // Add form instance
+  const [form] = Form.useForm();
 
   const token = localStorage.getItem("token");
   const API_BASE_URL = process.env.REACT_APP_API_URL || "https://smt-erp-driver-app-api.vercel.app";
 
-  // Fetch profile function that can be called multiple times
+  // Update localStorage with profile data
+  const updateLocalStorageUserData = (profileData) => {
+    try {
+      // Get current user data or create empty object
+      const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      // Update with profile data - note: API response has {success: true, profile: {...}}
+      const actualProfileData = profileData.profile || profileData;
+      
+      const updatedUserData = {
+        ...currentUserData,
+        id: actualProfileData.id,
+        name: actualProfileData.name,
+        email: actualProfileData.email,
+        avatar: getPhotoUrl(actualProfileData.photo_url),
+        role: actualProfileData.role,
+        companyName: actualProfileData.companyName,
+        phoneNumber: actualProfileData.phoneNumber
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUserData));
+      
+      // Dispatch custom event for TopHeader to listen to
+      window.dispatchEvent(new CustomEvent('userDataUpdated', {
+        detail: updatedUserData
+      }));
+      
+      // Also dispatch storage event
+      window.dispatchEvent(new Event('storage'));
+      
+    } catch (error) {
+      console.error("Error updating localStorage:", error);
+    }
+  };
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
+      
       const res = await axios.get(`${API_BASE_URL}/api/driver/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setProfile(res.data);
-      setError("");
       
-      // Update localStorage with latest profile data including photo from Employee collection
-      updateLocalStorageUserData(res.data);
+      if (res.data.success && res.data.profile) {
+        setProfile(res.data.profile);
+        setError("");
+        
+        // Update localStorage with the correct data structure
+        updateLocalStorageUserData(res.data);
+      } else {
+        throw new Error("Invalid profile data structure");
+      }
     } catch (err) {
       console.error("Error loading profile:", err);
       setError("Error fetching profile data");
@@ -78,23 +118,6 @@ const DriverProfile = () => {
     }
   };
 
-  // Function to update localStorage user data with photo from Employee collection
-  const updateLocalStorageUserData = (profileData) => {
-    const currentUserData = JSON.parse(localStorage.getItem('user') || '{}');
-    const updatedUserData = {
-      ...currentUserData,
-      name: profileData.name,
-      email: profileData.email,
-      avatar: getPhotoUrl(profileData.photo_url), // This comes from Employee collection
-      role: profileData.role,
-      companyName: profileData.companyName
-    };
-    localStorage.setItem('user', JSON.stringify(updatedUserData));
-    
-    // Dispatch storage event to notify TopHeader component
-    window.dispatchEvent(new Event('storage'));
-  };
-
   useEffect(() => {
     if (token) {
       fetchProfile();
@@ -104,7 +127,6 @@ const DriverProfile = () => {
     }
   }, [token, navigate]);
 
-  // FIXED: Remove event parameter since Ant Design Form doesn't pass it
   const handlePasswordChange = async (values) => {
     const { oldPassword, newPassword, confirmPassword } = values;
     
@@ -133,11 +155,7 @@ const DriverProfile = () => {
       setMessageText(res.data.message || "Password updated successfully");
       setError("");
       setShowPasswordForm(false);
-      
-      // Reset form fields
       form.resetFields();
-      
-      // Show success message
       message.success("Password updated successfully!");
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Error updating password";
@@ -191,7 +209,7 @@ const DriverProfile = () => {
         }
       );
 
-      // Refresh profile data to get updated photo URL from Employee collection
+      // Refresh profile data
       await fetchProfile();
       
       setMessageText("Profile photo updated successfully");
@@ -221,24 +239,24 @@ const DriverProfile = () => {
     return phoneNumber;
   };
 
-  // Add cache busting to photo URL to force refresh
+  // Fixed photo URL function
   const getPhotoUrl = (photoUrl) => {
     if (!photoUrl) return null;
     
-    // If it's already a full URL, return as is
+    // If it's already a full URL, return as is with cache busting
     if (photoUrl.startsWith('http')) {
       return `${photoUrl}?t=${new Date().getTime()}`;
     }
     
-    // If it's a relative path, prepend the API base URL
-    if (photoUrl.startsWith('/')) {
+    // If it starts with /uploads, prepend API base URL
+    if (photoUrl.startsWith('/uploads/')) {
       return `${API_BASE_URL}${photoUrl}?t=${new Date().getTime()}`;
     }
     
+    // If it's just a filename, construct the full path
     return `${API_BASE_URL}/uploads/drivers/${photoUrl}?t=${new Date().getTime()}`;
   };
 
-  // Handle cancel password change
   const handleCancelPasswordChange = () => {
     setShowPasswordForm(false);
     setError("");
@@ -352,7 +370,7 @@ const DriverProfile = () => {
                       <UserOutlined className="text-blue-600" />
                       <div>
                         <Text className="text-gray-600 text-sm block">Full Name</Text>
-                        <Text strong className="text-gray-900">{profile.name}</Text>
+                        <Text strong className="text-gray-900">{profile.name || "N/A"}</Text>
                       </div>
                     </div>
                   </Col>
@@ -362,7 +380,7 @@ const DriverProfile = () => {
                       <MailOutlined className="text-green-600" />
                       <div>
                         <Text className="text-gray-600 text-sm block">Email Address</Text>
-                        <Text strong className="text-gray-900">{profile.email}</Text>
+                        <Text strong className="text-gray-900">{profile.email || "N/A"}</Text>
                       </div>
                     </div>
                   </Col>
@@ -373,7 +391,7 @@ const DriverProfile = () => {
                       <div>
                         <Text className="text-gray-600 text-sm block">Phone Number</Text>
                         <Text strong className="text-gray-900">
-                          {formatPhoneNumber(profile.phoneNumber || profile.phone)}
+                          {formatPhoneNumber(profile.phoneNumber)}
                         </Text>
                       </div>
                     </div>
@@ -385,7 +403,7 @@ const DriverProfile = () => {
                       <div>
                         <Text className="text-gray-600 text-sm block">Company Name</Text>
                         <Text strong className="text-gray-900">
-                          {profile.companyName || profile.tenantCode || "N/A"}
+                          {profile.companyName || "N/A"}
                         </Text>
                       </div>
                     </div>
@@ -441,8 +459,8 @@ const DriverProfile = () => {
 
                 {showPasswordForm && (
                   <Form 
-                    form={form} // Add form instance
-                    onFinish={handlePasswordChange} // FIXED: Remove event parameter
+                    form={form}
+                    onFinish={handlePasswordChange}
                     layout="vertical"
                   >
                     <Form.Item 
