@@ -88,7 +88,7 @@ const TopHeader = ({ onToggleSidebar, currentPage }) => {
   );
 
   return (
-    <header className="bg-gradient-to-r from-blue-400 to-purple-500 px-4 sm:px-6 py-3 flex justify-between items-center shadow-md">
+    <header className="app-header bg-gradient-to-r from-blue-400 to-purple-500 px-4 sm:px-6 py-3 flex justify-between items-center shadow-md">
       {/* Left side - Logo, Name, Hamburger */}
       <div className="flex items-center space-x-3 sm:space-x-4 flex-1">
         <img 

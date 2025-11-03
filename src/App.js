@@ -54,7 +54,7 @@ const AppLayout = ({ children, sidebarCollapsed, onToggleSidebar, onCloseSidebar
           onToggleSidebar={onToggleSidebar} 
           currentPage={<CurrentPageTitle />}
         />
-        <Content className="bg-gray-50 min-h-screen w-full">
+        <Content className="bg-gray-50 min-h-screen w-full main-content">
           {children}
         </Content>
       </Layout>
