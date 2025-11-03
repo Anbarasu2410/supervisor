@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 
 const Login = () => {
@@ -7,7 +8,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+   
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -29,28 +31,30 @@ const Login = () => {
       console.log("🔄 Attempting login...");
       
       // Create AbortController for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      // const controller = new AbortController();
+      // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       // Make API call with timeout
       const res = await api.post("/auth/login", 
         { email, password },
         { 
-          signal: controller.signal,
-          timeout: 10000 // Additional axios timeout
+          // signal: controller.signal,
+          // timeout: 10000 // Additional axios timeout
         }
       );
       
-      clearTimeout(timeoutId);
+      //clearTimeout(timeoutId);
       
       console.log("✅ Login successful:", res.data);
       
+     
       // Immediate storage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+       localStorage.setItem("token", res.data.token);
+       localStorage.setItem("user", JSON.stringify(res.data.user));
       
       // Instant redirect - remove any delays
-      window.location.href = "/driver/tasks";
+      //window.location.href = "/driver/tasks";
+      navigate("/driver/tasks");
       
     } catch (err) {
       console.error("❌ Login error:", err);
