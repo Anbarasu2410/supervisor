@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 
 const Login = () => {
@@ -7,32 +8,75 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
+   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Immediate client-side validation
+    if (!email || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+    
+    if (!email.includes('@')) {
+      setError("Please enter a valid email address");
+      return;
+    }
+    
     setError("");
     setLoading(true);
 
     try {
       console.log("🔄 Attempting login...");
-      const res = await api.post("/auth/login", { email, password });
+      
+      // Create AbortController for timeout
+      // const controller = new AbortController();
+      // const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      // Make API call with timeout
+      const res = await api.post("/auth/login", 
+        { email, password },
+        { 
+          // signal: controller.signal,
+          // timeout: 10000 // Additional axios timeout
+        }
+      );
+      
+      //clearTimeout(timeoutId);
       
       console.log("✅ Login successful:", res.data);
       
-      // Store token and user data
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+     
+      // Immediate storage
+       localStorage.setItem("token", res.data.token);
+       localStorage.setItem("user", JSON.stringify(res.data.user));
       
-      console.log("🔐 Token stored, redirecting...");
-      
-      // FIX: Redirect to the correct driver tasks route
-      setTimeout(() => {
-        window.location.href = "/driver/tasks";
-      }, 500);
+      // Instant redirect - remove any delays
+      //window.location.href = "/driver/tasks";
+      navigate("/driver/tasks");
       
     } catch (err) {
       console.error("❌ Login error:", err);
-      setError(err.response?.data?.message || "Login failed");
+      
+      let errorMessage = "Login failed. Please try again.";
+      
+      // Handle different error types
+      if (err.name === 'AbortError' || err.code === 'ECONNABORTED') {
+        errorMessage = "Request timeout. Please check your connection and try again.";
+      } else if (err.response?.status === 401) {
+        errorMessage = "Invalid email or password";
+      } else if (err.response?.status === 400) {
+        errorMessage = "Invalid request. Please check your input.";
+      } else if (err.response?.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else if (!navigator.onLine) {
+        errorMessage = "No internet connection. Please check your network.";
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -55,11 +99,15 @@ const Login = () => {
             <label style={styles.label}>Email</label>
             <input
               type="email"
-              style={styles.input}
+              style={{
+                ...styles.input,
+                ...(loading ? styles.inputDisabled : {})
+              }}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              placeholder="Enter your email"
             />
           </div>
 
@@ -68,15 +116,22 @@ const Login = () => {
             <div style={styles.passwordContainer}>
               <input
                 type={showPassword ? "text" : "password"}
-                style={styles.passwordInput}
+                style={{
+                  ...styles.passwordInput,
+                  ...(loading ? styles.inputDisabled : {})
+                }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                placeholder="Enter your password"
               />
               <button
                 type="button"
-                style={styles.eyeButton}
+                style={{
+                  ...styles.eyeButton,
+                  ...(loading ? styles.buttonDisabled : {})
+                }}
                 onClick={togglePasswordVisibility}
                 disabled={loading}
               >
@@ -98,20 +153,46 @@ const Login = () => {
             type="submit" 
             style={{
               ...styles.button,
-              opacity: loading ? 0.7 : 1,
+              ...(loading ? styles.buttonLoading : {}),
               cursor: loading ? 'not-allowed' : 'pointer'
             }}
             disabled={loading}
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? (
+              <div style={styles.loadingContent}>
+                <div style={styles.spinner}></div>
+                Signing In...
+              </div>
+            ) : (
+              "Sign In"
+            )}
           </button>
 
           <div style={styles.footer}>
-            <label style={styles.rememberMe}>
-              <input type="checkbox" style={styles.checkbox} disabled={loading} /> 
+            <label style={{
+              ...styles.rememberMe,
+              ...(loading ? styles.labelDisabled : {})
+            }}>
+              <input 
+                type="checkbox" 
+                style={{
+                  ...styles.checkbox,
+                  ...(loading ? styles.inputDisabled : {})
+                }} 
+                disabled={loading} 
+              /> 
               <span style={styles.rememberText}>Remember me</span>
             </label>
-            <a href="#" style={styles.forgotLink}>Forgot password?</a>
+            <a 
+              href="/forgot-password" 
+              style={{
+                ...styles.forgotLink,
+                ...(loading ? styles.linkDisabled : {})
+              }}
+              onClick={(e) => loading && e.preventDefault()}
+            >
+              Forgot password?
+            </a>
           </div>
         </form>
       </div>
@@ -129,44 +210,50 @@ const styles = {
     fontFamily: "Arial, sans-serif",
   },
   card: {
-    width: 380, // Slightly reduced width
-    padding: 25, // Reduced from 30px
+    width: 380,
+    padding: 25,
     borderRadius: 12,
     background: "white",
     boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
   },
   header: {
     textAlign: "center",
-    marginBottom: 15, // Reduced from 20px
+    marginBottom: 15,
   },
   title: { 
     color: "#333",
-    fontSize: "24px", // Reduced from 28px
+    fontSize: "24px",
     fontWeight: "bold",
     margin: 0,
     padding: 0,
   },
   field: { 
-    marginBottom: 12, // Reduced from 15px
+    marginBottom: 12,
     display: "flex", 
     flexDirection: "column" 
   },
   label: {
-    marginBottom: 4, // Reduced from 5px
+    marginBottom: 4,
     fontWeight: "600",
     color: "#333",
-    fontSize: "13px", // Reduced from 14px
+    fontSize: "13px",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
   },
   input: {
-    padding: "10px", // Reduced from 12px
+    padding: "10px",
     border: "2px solid #e1e1e1",
     borderRadius: "6px",
     fontSize: "15px",
     outline: "none",
-    transition: "border-color 0.3s",
+    transition: "all 0.3s ease",
     backgroundColor: "#fafafa",
+  },
+  inputDisabled: {
+    backgroundColor: "#f8f8f8",
+    borderColor: "#e8e8e8",
+    color: "#aaa",
+    cursor: "not-allowed",
   },
   passwordContainer: {
     position: "relative",
@@ -174,88 +261,131 @@ const styles = {
     alignItems: "center",
   },
   passwordInput: {
-    padding: "10px 40px 10px 10px", // Reduced padding
+    padding: "10px 40px 10px 10px",
     border: "2px solid #e1e1e1",
     borderRadius: "6px",
     fontSize: "15px",
     width: "100%",
     outline: "none",
-    transition: "border-color 0.3s",
+    transition: "all 0.3s ease",
     backgroundColor: "#fafafa",
   },
   eyeButton: {
     position: "absolute",
-    right: "10px", // Reduced from 12px
+    right: "10px",
     background: "none",
     border: "none",
     cursor: "pointer",
-    fontSize: "15px", // Reduced from 16px
+    fontSize: "15px",
     padding: "0",
-    width: "22px", // Reduced from 24px
-    height: "22px", // Reduced from 24px
+    width: "22px",
+    height: "22px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     opacity: 0.6,
-    transition: "opacity 0.3s",
+    transition: "all 0.3s ease",
     borderRadius: "50%",
+  },
+  buttonDisabled: {
+    opacity: 0.4,
+    cursor: "not-allowed",
   },
   divider: {
     height: "1px",
     background: "#e1e1e1",
-    margin: "6px 0", // Reduced from 8px
+    margin: "6px 0",
   },
   button: {
     width: "100%",
-    padding: "10px", // Reduced from 12px
+    padding: "12px",
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
-    fontSize: "15px", // Reduced from 16px
+    fontSize: "15px",
     fontWeight: "bold",
-    transition: "background-color 0.3s",
-    marginBottom: "8px", // Reduced from 10px
+    transition: "all 0.3s ease",
+    marginBottom: "8px",
+    position: "relative",
+  },
+  buttonLoading: {
+    backgroundColor: "#66a8ff",
+    color: "#ffffff",
+  },
+  loadingContent: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+  },
+  spinner: {
+    width: "16px",
+    height: "16px",
+    border: "2px solid rgba(255,255,255,0.5)",
+    borderTop: "2px solid white",
+    borderRadius: "50%",
+    animation: "spin 1s linear infinite",
   },
   footer: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    fontSize: "13px", // Reduced from 14px
+    fontSize: "13px",
   },
   rememberMe: {
     display: "flex",
     alignItems: "center",
-    gap: "5px", // Reduced from 6px
+    gap: "5px",
     cursor: "pointer",
     color: "#666",
   },
+  labelDisabled: {
+    color: "#ccc",
+    cursor: "not-allowed",
+  },
   checkbox: {
     margin: 0,
-    width: "14px", // Reduced from 16px
-    height: "14px", // Reduced from 16px
+    width: "14px",
+    height: "14px",
+    cursor: "pointer",
   },
   rememberText: {
-    fontSize: "13px", // Reduced from 14px
+    fontSize: "13px",
     color: "#666",
   },
   forgotLink: {
-    fontSize: "13px", // Reduced from 14px
+    fontSize: "13px",
     color: "#007bff",
     textDecoration: "none",
     fontWeight: "500",
+    transition: "color 0.3s ease",
+  },
+  linkDisabled: {
+    color: "#ccc",
+    pointerEvents: "none",
   },
   error: {
-    color: "red", 
-    fontSize: "13px", // Reduced from 14px
-    padding: "6px", // Reduced from 8px
-    background: "#ffe6e6", 
+    color: "#d32f2f",
+    fontSize: "13px",
+    padding: "8px",
+    background: "#ffebee",
     borderRadius: "4px",
-    marginBottom: "4px", // Reduced from 5px
+    marginBottom: "8px",
     textAlign: "center",
-    border: "1px solid #ffcccc",
+    border: "1px solid #ffcdd2",
   },
 };
+
+// Add CSS for spinner animation
+const spinnerStyle = document.createElement('style');
+spinnerStyle.textContent = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+document.head.appendChild(spinnerStyle);
 
 export default Login;
