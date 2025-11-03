@@ -3,7 +3,7 @@ import { Dropdown, Avatar, Button } from 'antd';
 import { MoonOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-const TopHeader = ({ onToggleSidebar }) => {
+const TopHeader = ({ onToggleSidebar, currentPage }) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({});
 
@@ -88,15 +88,16 @@ const TopHeader = ({ onToggleSidebar }) => {
   );
 
   return (
-    <header className="bg-gradient-to-r from-blue-400 to-purple-500 px-6 py-3 flex justify-between items-center shadow-md">
+    <header className="bg-gradient-to-r from-blue-400 to-purple-500 px-4 sm:px-6 py-3 flex justify-between items-center shadow-md">
       {/* Left side - Logo, Name, Hamburger */}
-      <div className="flex items-center space-x-4 flex-1">
+      <div className="flex items-center space-x-3 sm:space-x-4 flex-1">
         <img 
           src="/logo.jpg" 
           alt="Logo" 
           className="h-8 w-auto"
         />
-        <div className="text-white text-lg font-bold">
+        {/* ERP Name - Hidden on mobile, visible on sm screens and up */}
+        <div className="text-white text-lg font-bold hidden sm:block">
           ERP
         </div>
         <div 
@@ -107,19 +108,19 @@ const TopHeader = ({ onToggleSidebar }) => {
         </div>
       </div>
 
-      {/* Center - Driver Dashboard */}
+      {/* Center - Dynamic Page Title */}
       <div className="flex-1 flex justify-center">
         <div className="text-white text-lg font-semibold">
-          Driver Dashboard
+          {currentPage}
         </div>
       </div>
 
       {/* Right side - Moon Icon and Avatar */}
-      <div className="flex items-center space-x-4 flex-1 justify-end">
+      <div className="flex items-center space-x-3 sm:space-x-4 flex-1 justify-end">
         <Button 
           type="text" 
           icon={<MoonOutlined />} 
-          className="text-white hover:bg-white hover:bg-opacity-20"
+          className="text-white hover:bg-white hover:bg-opacity-20 hidden sm:flex"
         />
         
         <Dropdown 
