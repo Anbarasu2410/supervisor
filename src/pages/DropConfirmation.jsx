@@ -58,7 +58,7 @@ const DropConfirmation = () => {
           setTask(response.data);
           const initializedPassengers = response.data.passengers?.map(p => ({
             ...p,
-            drop_status: p.drop_status || 'pending'
+            dropStatus: p.dropStatus || 'pending'
           })) || [];
           setPassengers(initializedPassengers);
         }
@@ -84,7 +84,7 @@ const DropConfirmation = () => {
           };
           return {
             ...passenger,
-            drop_status: statusCycle[passenger.drop_status]
+            dropStatus: statusCycle[passenger.dropStatus]
           };
         }
         return passenger;
@@ -99,11 +99,11 @@ const DropConfirmation = () => {
       setSuccess('');
 
       const confirmedIds = passengers
-        .filter(p => p.drop_status === 'confirmed')
+        .filter(p => p.dropStatus === 'confirmed')
         .map(p => p.id);
 
       const missedIds = passengers
-        .filter(p => p.drop_status === 'missed')
+        .filter(p => p.dropStatus === 'missed')
         .map(p => p.id);
 
       console.log('Sending drop confirmation:', { confirmed: confirmedIds, missed: missedIds });
@@ -189,9 +189,9 @@ const DropConfirmation = () => {
     );
   }
 
-  const confirmedCount = passengers.filter(p => p.drop_status === 'confirmed').length;
-  const missedCount = passengers.filter(p => p.drop_status === 'missed').length;
-  const pendingCount = passengers.filter(p => p.drop_status === 'pending').length;
+  const confirmedCount = passengers.filter(p => p.dropStatus === 'confirmed').length;
+  const missedCount = passengers.filter(p => p.dropStatus === 'missed').length;
+  const pendingCount = passengers.filter(p => p.dropStatus === 'pending').length;
 
   const allPassengersProcessed = pendingCount === 0 && passengers.length > 0;
 
@@ -226,15 +226,15 @@ const DropConfirmation = () => {
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center space-x-2">
             <ProjectOutlined className="text-blue-600" />
-            <Text strong className="text-gray-900 text-lg">Project: {task?.project_name}</Text>
+            <Text strong className="text-gray-900 text-lg">Project: {task?.projectName}</Text>
           </div>
           <div className="flex items-center justify-center space-x-2">
             <CarOutlined className="text-green-600" />
-            <Text strong className="text-gray-900">Vehicle: {task?.vehicle_no}</Text>
+            <Text strong className="text-gray-900">Vehicle: {task?.vehicleNo}</Text>
           </div>
           <div className="flex items-center justify-center space-x-2">
             <ClockCircleOutlined className="text-orange-600" />
-            <Text strong className="text-gray-900">{formatTime(task?.start_time)} → {formatTime(task?.end_time)}</Text>
+            <Text strong className="text-gray-900">{formatTime(task?.startTime)} → {formatTime(task?.endTime)}</Text>
           </div>
         </div>
       </Card>
@@ -257,9 +257,9 @@ const DropConfirmation = () => {
                 key={passenger.id || index}
                 onClick={() => togglePassengerStatus(index)}
                 className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                  passenger.drop_status === 'confirmed' 
+                  passenger.dropStatus === 'confirmed' 
                     ? 'bg-green-50 border-green-200' 
-                    : passenger.drop_status === 'missed'
+                    : passenger.dropStatus === 'missed'
                     ? 'bg-red-50 border-red-200'
                     : 'bg-gray-50 border-gray-200 hover:bg-blue-50'
                 }`}
@@ -269,9 +269,9 @@ const DropConfirmation = () => {
                     size="default"
                     icon={<UserOutlined />}
                     className={`${
-                      passenger.drop_status === 'confirmed' 
+                      passenger.dropStatus === 'confirmed' 
                         ? 'bg-green-500' 
-                        : passenger.drop_status === 'missed'
+                        : passenger.dropStatus === 'missed'
                         ? 'bg-red-500'
                         : 'bg-gray-400'
                     } text-white`}
@@ -281,15 +281,15 @@ const DropConfirmation = () => {
                       {passenger.name || `Passenger ${index + 1}`}
                     </Text>
                     <Text className="text-gray-600 text-sm">
-                      {passenger.pickup_point || 'Location not specified'}
+                      {passenger.pickupPoint || 'Location not specified'}
                     </Text>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Tag color={getStatusColor(passenger.drop_status)} className="m-0">
-                    {getStatusText(passenger.drop_status)}
+                  <Tag color={getStatusColor(passenger.dropStatus)} className="m-0">
+                    {getStatusText(passenger.dropStatus)}
                   </Tag>
-                  {getStatusIcon(passenger.drop_status)}
+                  {getStatusIcon(passenger.dropStatus)}
                 </div>
               </div>
             ))

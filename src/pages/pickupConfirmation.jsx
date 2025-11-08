@@ -58,7 +58,7 @@ const PickupConfirmation = () => {
           setTask(response.data);
           const initializedPassengers = response.data.passengers?.map(p => ({
             ...p,
-            pickup_status: 'pending'
+            pickupStatus: 'pending'
           })) || [];
           setPassengers(initializedPassengers);
         }
@@ -84,7 +84,7 @@ const PickupConfirmation = () => {
           };
           return {
             ...passenger,
-            pickup_status: statusCycle[passenger.pickup_status]
+            pickupStatus: statusCycle[passenger.pickupStatus]
           };
         }
         return passenger;
@@ -99,11 +99,11 @@ const PickupConfirmation = () => {
       setSuccess('');
 
       const confirmedIds = passengers
-        .filter(p => p.pickup_status === 'present')
+        .filter(p => p.pickupStatus === 'present')
         .map(p => p.id);
 
       const missedIds = passengers
-        .filter(p => p.pickup_status === 'absent')
+        .filter(p => p.pickupStatus === 'absent')
         .map(p => p.id);
 
       console.log('Sending pickup confirmation:', { confirmed: confirmedIds, missed: missedIds });
@@ -189,9 +189,9 @@ const PickupConfirmation = () => {
     );
   }
 
-  const presentCount = passengers.filter(p => p.pickup_status === 'present').length;
-  const absentCount = passengers.filter(p => p.pickup_status === 'absent').length;
-  const pendingCount = passengers.filter(p => p.pickup_status === 'pending').length;
+  const presentCount = passengers.filter(p => p.pickupStatus === 'present').length;
+  const absentCount = passengers.filter(p => p.pickupStatus === 'absent').length;
+  const pendingCount = passengers.filter(p => p.pickupStatus === 'pending').length;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -223,15 +223,15 @@ const PickupConfirmation = () => {
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center space-x-2">
             <ProjectOutlined className="text-blue-600" />
-            <Text strong className="text-gray-900 text-lg">Project: {task?.project_name}</Text>
+            <Text strong className="text-gray-900 text-lg">Project: {task?.projectName}</Text>
           </div>
           <div className="flex items-center justify-center space-x-2">
             <CarOutlined className="text-green-600" />
-            <Text strong className="text-gray-900">Vehicle: {task?.vehicle_no}</Text>
+            <Text strong className="text-gray-900">Vehicle: {task?.vehicleNo}</Text>
           </div>
           <div className="flex items-center justify-center space-x-2">
             <ClockCircleOutlined className="text-orange-600" />
-            <Text strong className="text-gray-900">{formatTime(task?.start_time)} → {formatTime(task?.end_time)}</Text>
+            <Text strong className="text-gray-900">{formatTime(task?.startTime)} → {formatTime(task?.endTime)}</Text>
           </div>
         </div>
       </Card>
@@ -246,9 +246,9 @@ const PickupConfirmation = () => {
                 key={passenger.id || index}
                 onClick={() => togglePassengerStatus(index)}
                 className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
-                  passenger.pickup_status === 'present' 
+                  passenger.pickupStatus === 'present' 
                     ? 'bg-green-50 border-green-200' 
-                    : passenger.pickup_status === 'absent'
+                    : passenger.pickupStatus === 'absent'
                     ? 'bg-red-50 border-red-200'
                     : 'bg-gray-50 border-gray-200'
                 }`}
@@ -264,15 +264,15 @@ const PickupConfirmation = () => {
                       {passenger.name || `Passenger ${index + 1}`}
                     </Text>
                     <Text className="text-gray-600 text-sm">
-                      {passenger.pickup_point || 'Location not specified'}
+                      {passenger.pickupPoint || 'Location not specified'}
                     </Text>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Tag color={getStatusColor(passenger.pickup_status)} className="m-0">
-                    {getStatusText(passenger.pickup_status)}
+                  <Tag color={getStatusColor(passenger.pickupStatus)} className="m-0">
+                    {getStatusText(passenger.pickupStatus)}
                   </Tag>
-                  {getStatusIcon(passenger.pickup_status)}
+                  {getStatusIcon(passenger.pickupStatus)}
                 </div>
               </div>
             ))

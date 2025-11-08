@@ -180,12 +180,12 @@ const TaskDetails = () => {
     if (task.status === 'ONGOING') {
       return (
         <div className="space-y-3">
-          {task.actual_start_time && (
+          {task.actualStartTime && (
             <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
               <ClockCircleOutlined className="text-blue-600" />
               <div>
                 <Text className="text-gray-600 text-sm block">Pickup Time</Text>
-                <Text strong className="text-gray-900">{formatTimeIST(task.actual_start_time)}</Text>
+                <Text strong className="text-gray-900">{formatTimeIST(task.actualStartTime)}</Text>
               </div>
             </div>
           )}
@@ -196,21 +196,21 @@ const TaskDetails = () => {
     if (task.status === 'COMPLETED') {
       return (
         <div className="space-y-3">
-          {task.actual_start_time && (
+          {task.actualStartTime && (
             <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
               <ClockCircleOutlined className="text-blue-600" />
               <div>
                 <Text className="text-gray-600 text-sm block">Pickup Time</Text>
-                <Text strong className="text-gray-900">{formatTimeIST(task.actual_start_time)}</Text>
+                <Text strong className="text-gray-900">{formatTimeIST(task.actualStartTime)}</Text>
               </div>
             </div>
           )}
-          {task.actual_end_time && (
+          {task.actualEndTime && (
             <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
               <CheckCircleOutlined className="text-green-600" />
               <div>
                 <Text className="text-gray-600 text-sm block">Drop Time</Text>
-                <Text strong className="text-gray-900">{formatTimeIST(task.actual_end_time)}</Text>
+                <Text strong className="text-gray-900">{formatTimeIST(task.actualEndTime)}</Text>
               </div>
             </div>
           )}
@@ -286,7 +286,7 @@ const TaskDetails = () => {
         <div className="flex items-center space-x-3">
           <div className="flex-1">
             <Text className="text-gray-600 text-sm block">Trip Details</Text>
-            <Text strong className="text-gray-900">{task.project_name}</Text>
+            <Text strong className="text-gray-900">{task.projectName}</Text>
           </div>
           <Tag 
             color={statusConfig.color}
@@ -312,7 +312,7 @@ const TaskDetails = () => {
               </div>
               <div>
                 <Text className="text-gray-600 text-sm">Vehicle</Text>
-                <Text strong className="text-gray-900 block">{task.vehicle_no}</Text>
+                <Text strong className="text-gray-900 block">{task.vehicleNo}</Text>
               </div>
             </div>
 
@@ -322,7 +322,7 @@ const TaskDetails = () => {
               </div>
               <div>
                 <Text className="text-gray-600 text-sm">Date</Text>
-                <Text strong className="text-gray-900">{formatDate(task.start_time)}</Text>
+                <Text strong className="text-gray-900">{formatDate(task.startTime)}</Text>
               </div>
             </div>
 
@@ -347,7 +347,7 @@ const TaskDetails = () => {
                 </div>
                 <div className="flex-1">
                   <Text className="text-gray-600 text-sm block">Pickup Location</Text>
-                  <Text strong className="text-gray-900">{task.pickup_location}</Text>
+                  <Text strong className="text-gray-900">{task.pickupLocation}</Text>
                 </div>
               </div>
               
@@ -357,7 +357,7 @@ const TaskDetails = () => {
                 </div>
                 <div className="flex-1">
                   <Text className="text-gray-600 text-sm block">Drop-off Location</Text>
-                  <Text strong className="text-gray-900">{task.drop_location}</Text>
+                  <Text strong className="text-gray-900">{task.dropLocation}</Text>
                 </div>
               </div>
             </div>
