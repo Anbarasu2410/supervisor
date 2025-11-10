@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // Strictly use .env variable
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+
+const API_BASE_URL = `${process.env.REACT_APP_API_URL}/api`;
+
 
 if (!API_BASE_URL) {
   console.error('❌ REACT_APP_API_URL is not set in your .env file.');
