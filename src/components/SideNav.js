@@ -9,7 +9,9 @@ import {
   DoubleLeftOutlined,
   DashboardOutlined,
   LogoutOutlined,
-  TeamOutlined
+  TeamOutlined,
+  ProjectOutlined,
+  DeploymentUnitOutlined
 } from '@ant-design/icons';
 
 const SideNav = ({ collapsed, onClose, user }) => {
@@ -38,6 +40,16 @@ const SideNav = ({ collapsed, onClose, user }) => {
           icon: <HistoryOutlined />,
           label: 'Trip History',
         },
+        {
+      key: '/attendance',
+      icon: <HistoryOutlined />,
+      label: "Attendance",
+    },
+      {
+      key: '/attendance/history',
+      icon: <HistoryOutlined />,
+      label: "AttendanceHistory",
+    },
         ...commonItems
       ];
     }
@@ -49,7 +61,55 @@ const SideNav = ({ collapsed, onClose, user }) => {
           icon: <TeamOutlined />,
           label: "Today's Trip",
         },
+          {
+      key: '/attendance',
+      icon: <HistoryOutlined />,
+      label: "Attendance",
+    },
+     {
+      key: '/attendance/history',
+      icon: <HistoryOutlined />,
+      label: "AttendanceHistory",
+    },
+    {
+  key: '/worker/my-task',
+  icon: <DeploymentUnitOutlined />,
+  label: 'My Task Today',
+},
+
+    
         ...commonItems
+      ];
+    }
+
+    // Only add for admin role
+  
+
+    // Add for other roles if they should also see it
+    if ( user?.role === 'supervisor') {
+      return [
+        {
+          key: '/supervisor/dashboard',
+          icon: <DashboardOutlined />,
+          label: 'Dashboard',
+        },
+            { key: '/supervisor/tasks', icon: <ProjectOutlined />, label: 'Task Assignment' },
+            {
+  key: "/supervisor/review-tasks",
+  icon: <DeploymentUnitOutlined />,
+  label: "Task Review"
+},
+{
+  key: "/supervisor/daily-progress",
+  icon: <DeploymentUnitOutlined />,
+  label: "Daily Progress"
+},
+
+        {
+          key: '/profile',
+          icon: <UserOutlined />,
+          label: 'Profile',
+        },
       ];
     }
 
@@ -75,6 +135,10 @@ const SideNav = ({ collapsed, onClose, user }) => {
     switch(user?.role) {
       case 'driver': return 'Driver Portal';
       case 'worker': return 'Worker Portal';
+      case 'admin': return 'Admin Portal';
+      case 'boss': return 'Boss Portal';
+      case 'manager': return 'Manager Portal';
+      case 'supervisor': return 'Supervisor Portal';
       default: return 'Portal';
     }
   };

@@ -10,11 +10,20 @@ import DropConfirmation from './pages/DropConfirmation';
 import TripSummary from './pages/TripSummary';
 import TripHistory from './pages/TripHistory';
 import DriverProfile from './pages/DriverProfile';
+import WorkerAttendance from "./pages/worker/WorkerAttendance.jsx";
+import GeoFenceAttendance from './pages/attendance/GeoFenceAttendance';
+import AttendanceHistory from './pages/attendance/AttendanceHistory';
+import TaskAssignmentScreen from './pages/supervisor/TaskAssignmentScreen.jsx';
+import MyTaskToday from  './pages/worker/MyTaskToday'
 
 import TodayTrip from './pages/worker/TodayTrip';
 import TopHeader from './components/TopHeader';
 import SideNav from './components/SideNav';
+import SupervisorDashboard from './pages/supervisor/SupervisorDashboard.jsx';
+import WorkerTaskReviewToday from './pages/supervisor/WorkerTaskReviewToday.jsx';
+
 import { Layout } from 'antd';
+import SupervisorDailyProgress from './pages/supervisor/SupervisorDailyProgress.jsx';
 
 const { Content } = Layout;
 
@@ -30,12 +39,21 @@ const CurrentPageTitle = () => {
   const getPageTitle = (pathname) => {
     if (pathname === '/driver/tasks' || pathname === '/tasks') return 'My Tasks';
     if (pathname === '/driver/trip-history') return 'Trip History';
+      if (pathname === '/attendance') return 'Attendance';
+      if (pathname === '/attendance/history') return 'AttendanceHistory';
     if (pathname === '/worker/today-trip') return "Today's Trip";
+      if (pathname === '/attendance') return 'Attendance';
+      if (pathname === '/attendance/history') return 'AttendanceHistory';
     if (pathname === '/profile') return 'Profile';
     if (pathname.includes('/driver/tasks/') && pathname.includes('/pickup')) return 'Pickup Confirmation';
     if (pathname.includes('/driver/tasks/') && pathname.includes('/drop')) return 'Drop Confirmation';
     if (pathname.includes('/driver/tasks/') && pathname.includes('/summary')) return 'Trip Summary';
     if (pathname.includes('/driver/tasks/')) return 'Task Details';
+    if (pathname === '/admin/tasks') return 'Admin Tasks';
+if (pathname === '/boss/tasks') return 'Boss Tasks';
+if (pathname === '/manager/tasks') return 'Manager Tasks';
+if (pathname === '/supervisor/dashboard') return 'Supervisor Tasks';
+
     return 'My Tasks';
   };
 
@@ -189,6 +207,20 @@ function App() {
               </ProtectedRoute>
             } 
           />
+  <Route 
+            path="/worker/my-task" 
+            element={
+              <ProtectedRoute>
+                <AppLayout 
+                  sidebarCollapsed={sidebarCollapsed}
+                  onToggleSidebar={handleToggleSidebar}
+                  onCloseSidebar={handleCloseSidebar}
+                >
+                  <MyTaskToday />
+                </AppLayout>
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Worker Routes */}
           <Route 
@@ -205,7 +237,172 @@ function App() {
               </ProtectedRoute>
             } 
           />
-         // 
+         
+          
+         {/* <Route 
+  path="/attendance" 
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <WorkerAttendance />
+      </AppLayout>
+    </ProtectedRoute>
+  } 
+/> */}
+<Route 
+  path="/attendance" 
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <GeoFenceAttendance />
+      </AppLayout>
+    </ProtectedRoute>
+  } 
+/>
+<Route 
+  path="/attendance/history" 
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <AttendanceHistory />
+      </AppLayout>
+    </ProtectedRoute>
+  } 
+/>
+{/* Admin Tasks */}
+<Route 
+  path="/admin/tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <Tasks />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
+{/* Boss Tasks */}
+<Route 
+  path="/boss/tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <Tasks />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
+{/* Manager Tasks */}
+<Route 
+  path="/manager/tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <Tasks />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
+{/* Supervisor Tasks */}
+<Route 
+  path="/supervisor/dashboard"
+  element={
+    <ProtectedRoute>
+      <AppLayout 
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <SupervisorDashboard />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/supervisor/tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <TaskAssignmentScreen />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/supervisor/tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <TaskAssignmentScreen />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/supervisor/review-tasks"
+  element={
+    <ProtectedRoute>
+      <AppLayout
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <WorkerTaskReviewToday />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/supervisor/daily-progress"
+  element={
+    <ProtectedRoute>
+      <AppLayout
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={handleToggleSidebar}
+        onCloseSidebar={handleCloseSidebar}
+      >
+        <SupervisorDailyProgress />
+      </AppLayout>
+    </ProtectedRoute>
+  }
+/>
+
           
           {/* Common Routes */}
           <Route 
@@ -241,8 +438,21 @@ const NavigateToRoleBasedRoute = () => {
       return <Navigate to="/driver/tasks" replace />;
     case 'worker':
       return <Navigate to="/worker/today-trip" replace />;
-    case 'admin':
-      return <Navigate to="/admin/dashboard" replace />;
+      
+   
+      case 'boss':
+  return <Navigate to="/boss/tasks" replace />;
+
+case 'manager':
+  return <Navigate to="/manager/tasks" replace />;
+
+case 'supervisor':
+  return <Navigate to="/supervisor/dashboard" replace />;
+
+
+case 'admin':
+  return <Navigate to="/admin/tasks" replace />;
+
     default:
       return <Navigate to="/login" replace />;
   }

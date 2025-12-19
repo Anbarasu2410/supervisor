@@ -29,7 +29,7 @@ const Login = () => {
 
     try {
       const result = await login(email, password);
-      
+      console.log(result)
       if (result.success) {
         const userRole = result.role;
         

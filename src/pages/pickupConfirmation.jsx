@@ -56,16 +56,36 @@ const PickupConfirmation = () => {
 
   // Construct full photo URL
   const getPhotoUrl = (photoUrl) => {
-    console.log('PhotoUrl', photoUrl);
     if (!photoUrl) return '';
     if (photoUrl.startsWith('http')) return photoUrl;
     const cleanUrl = photoUrl.startsWith('/') ? photoUrl.slice(1) : photoUrl;
-    console.log('Clean URL:', cleanUrl);
-    console.log('Photo URL:', `${process.env.REACT_APP_API_URL}`);  
     return `${process.env.REACT_APP_API_URL}/${cleanUrl}`;
   };
 
-  const formatTime = (dateString) => dateString ? dayjs(dateString).format('HH:mm A') : 'N/A';
+  // Enhanced time formatting function that handles both formatted strings and UTC dates
+  const formatTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    
+    try {
+      // If it's already a formatted time string like "12:00 AM", return as is
+      if (typeof dateString === 'string' && /^\d{1,2}:\d{2} (AM|PM)$/i.test(dateString)) {
+        return dateString;
+      }
+      
+      // If it's a UTC date string, parse and format it
+      const date = dayjs(dateString);
+      
+      if (!date.isValid()) {
+        return 'Invalid time';
+      }
+      
+      // Format to 12-hour format with AM/PM
+      return date.format('hh:mm A');
+    } catch (error) {
+      console.error('Error formatting time:', error, dateString);
+      return 'N/A';
+    }
+  };
 
   // Fetch task details and existing photos
   useEffect(() => {
@@ -74,9 +94,15 @@ const PickupConfirmation = () => {
         setLoading(true);
         setError('');
         
-        // Fetch task details
+        // Fetch task details - use the same API as Today Tasks
         const taskResponse = await api.get(`/driver/tasks/${taskId}`);
         if (taskResponse.data) {
+          console.log('Task data for pickup confirmation:', {
+            startTime: taskResponse.data.startTime,
+            endTime: taskResponse.data.endTime,
+            formattedStart: formatTime(taskResponse.data.startTime),
+            formattedEnd: formatTime(taskResponse.data.endTime)
+          });
           setTask(taskResponse.data);
           const initializedPassengers = taskResponse.data.passengers?.map(p => ({
             ...p,
@@ -85,7 +111,7 @@ const PickupConfirmation = () => {
           setPassengers(initializedPassengers);
         }
 
-        // Fetch existing photos for this task
+        // Fetch existing photos for this task from fleet tasks API
         const photosResponse = await api.get(`/fleet-tasks/${taskId}/photos?photoType=pickup`);
         if (photosResponse.data.success) {
           setPickupPhotos(photosResponse.data.data || []);
